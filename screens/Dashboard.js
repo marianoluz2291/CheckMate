@@ -511,12 +511,6 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 4,
   },
-  editInput: {
-    flex: 1,
-    fontSize: 16,
-    padding: 4,
-    borderBottomWidth: 1,
-  },
   inputContainer: {
     flexDirection: 'row',
     padding: 12,

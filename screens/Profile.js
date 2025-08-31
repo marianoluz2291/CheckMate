@@ -504,11 +504,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -648,20 +643,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginLeft: 8,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoutText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    marginLeft: 8,
-    fontSize: 16,
   },
   deleteAccountButton: {
     flexDirection: 'row',

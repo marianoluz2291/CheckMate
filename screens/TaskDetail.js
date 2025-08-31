@@ -73,7 +73,6 @@ export default function TaskDetail({ route, navigation }) {
     } catch (error) {
       console.error('Unexpected error:', error);
       Alert.alert('Error', 'An unexpected error occurred');
-    } finally {
     }
   };
 
@@ -651,16 +650,6 @@ const styles = StyleSheet.create({
   completionTimeValue: {
     fontSize: 14,
     fontWeight: '500',
-  },
-  description: {
-    minHeight: 100,
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-  },
-  descriptionText: {
-    fontSize: 16,
-    lineHeight: 24,
   },
   deleteButton: {
     flexDirection: 'row',

@@ -133,12 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     paddingHorizontal: 10,
   },
-  name: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#333333',
-    marginTop: -5,
-  },
   card: {
     backgroundColor: 'white',
     borderRadius: 15,
@@ -217,10 +211,5 @@ const styles = StyleSheet.create({
   },
   logoAccent: {
     color: '#FF8A9B',
-  },
-  logoIcon: {
-    width: 32, 
-    height: 32,
-    marginLeft: 8,
   },
 });

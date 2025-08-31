@@ -17,15 +17,15 @@ Navigate your terminal into the folder using **cd CheckMate** (or open the folde
 
 Simply run the command **npm install** followed by **npm start** to enable the installation of the node modules and start the expo module.
 
-#### Important Info:
-Video Demo Link: 
+### Important Info:
+Video Demo Link: https://youtu.be/Y8R5aoUMSgg
 
 Test Account login details:
-
 Email: abc@123.com
-
 Password: 123456
 
 Snack-Demo: https://snack.expo.dev/@marianoluz2291/checkmate
+
+Github: https://github.com/marianoluz2291/CheckMate
 
 Thank you!

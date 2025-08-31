@@ -244,15 +244,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-  },
   header: {
     paddingHorizontal: 20,
     paddingTop: 60,
@@ -375,14 +366,6 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 8,
     borderRadius: 8,
-  },
-  progressBarContainer: {
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
   },
   refreshButton: {
     flexDirection: 'row',
