@@ -13,7 +13,7 @@ import CreateTask from './screens/CreateTask';
 import TaskDetail from './screens/TaskDetail';
 import WeeklyDigest from './screens/WeeklyDigest';
 
-import NetworkChecker from './functions//NetworkChecker';
+import NetworkChecker from './functions/NetworkChecker';
 import { ThemeContext, themeColors, getTheme } from './functions/ThemeContext';
 
 
