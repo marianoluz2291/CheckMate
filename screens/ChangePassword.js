@@ -1,13 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  ActivityIndicator, 
-  Alert 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { firebase } from '../config';
@@ -63,7 +63,6 @@ const ChangePassword = ({ navigation }) => {
     if (!validateForm()) {
       return;
     }
-
     try {
       const user = firebase.auth().currentUser;
 
@@ -72,7 +71,6 @@ const ChangePassword = ({ navigation }) => {
         navigation.goBack();
         return;
       }
-      
       // First validate current password by attempting to sign in
       const { error: signInError } = await firebase.auth().signInWithEmailAndPassword(user.email, currentPassword);
       if (signInError) {
@@ -101,12 +99,12 @@ const ChangePassword = ({ navigation }) => {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       contentContainerStyle={styles.contentContainer}
     >
       <SafeAreaView style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -125,7 +123,7 @@ const ChangePassword = ({ navigation }) => {
         {/* Current Password Field */}
         <View style={styles.inputContainer}>
           <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Current Password</Text>
-          <View style={[styles.inputWrapper, { 
+          <View style={[styles.inputWrapper, {
             borderColor: errors.currentPassword ? theme.colors.error : theme.colors.border,
             backgroundColor: theme.colors.inputBackground
           }]}>
@@ -242,68 +240,68 @@ const ChangePassword = ({ navigation }) => {
           </Text>
           <View style={styles.requirementItem}>
             <Feather 
-              name={newPassword.length >= 8 ? 'check-circle' : 'circle'} 
+              name={newPassword.length >= 8 ? 'check-circle' : 'circle'}
               size={16} 
-              color={newPassword.length >= 8 ? theme.colors.success : theme.colors.secondaryText} 
+              color={newPassword.length >= 8 ? theme.colors.success : theme.colors.secondaryText}
             />
-            <Text style={[styles.requirementText, { 
-              color: newPassword.length >= 8 ? theme.colors.success : theme.colors.secondaryText 
+            <Text style={[styles.requirementText, {
+              color: newPassword.length >= 8 ? theme.colors.success : theme.colors.secondaryText
             }]}>
               At least 8 characters
             </Text>
           </View>
           <View style={styles.requirementItem}>
-            <Feather 
-              name={/[A-Z]/.test(newPassword) ? 'check-circle' : 'circle'} 
-              size={16} 
-              color={/[A-Z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText} 
+            <Feather
+              name={/[A-Z]/.test(newPassword) ? 'check-circle' : 'circle'}
+              size={16}
+              color={/[A-Z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText}
             />
-            <Text style={[styles.requirementText, { 
-              color: /[A-Z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText 
+            <Text style={[styles.requirementText, {
+              color: /[A-Z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText
             }]}>
               At least one uppercase letter
             </Text>
           </View>
           <View style={styles.requirementItem}>
-            <Feather 
-              name={/[a-z]/.test(newPassword) ? 'check-circle' : 'circle'} 
-              size={16} 
-              color={/[a-z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText} 
+            <Feather
+              name={/[a-z]/.test(newPassword) ? 'check-circle' : 'circle'}
+              size={16}
+              color={/[a-z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText}
             />
-            <Text style={[styles.requirementText, { 
-              color: /[a-z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText 
+            <Text style={[styles.requirementText, {
+              color: /[a-z]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText
             }]}>
               At least one lowercase letter
             </Text>
           </View>
           <View style={styles.requirementItem}>
-            <Feather 
-              name={/[0-9]/.test(newPassword) ? 'check-circle' : 'circle'} 
-              size={16} 
-              color={/[0-9]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText} 
+            <Feather
+              name={/[0-9]/.test(newPassword) ? 'check-circle' : 'circle'}
+              size={16}
+              color={/[0-9]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText}
             />
-            <Text style={[styles.requirementText, { 
-              color: /[0-9]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText 
+            <Text style={[styles.requirementText, {
+              color: /[0-9]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText
             }]}>
               At least one number
             </Text>
           </View>
           <View style={styles.requirementItem}>
-            <Feather 
-              name={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'check-circle' : 'circle'} 
-              size={16} 
-              color={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText} 
+            <Feather
+              name={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'check-circle' : 'circle'}
+              size={16}
+              color={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText}
             />
-            <Text style={[styles.requirementText, { 
-              color: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText 
+            <Text style={[styles.requirementText, {
+              color: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? theme.colors.success : theme.colors.secondaryText
             }]}>
               At least one special character
             </Text>
           </View>
         </View>
 
-        <TouchableOpacity 
-          style={[styles.updateButton, { 
+        <TouchableOpacity
+          style={[styles.updateButton, {
             backgroundColor: theme.colors.primary,
           }]}
           onPress={handleChangePassword}

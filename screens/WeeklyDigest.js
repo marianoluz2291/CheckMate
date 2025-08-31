@@ -21,7 +21,7 @@ const WeeklyDigest = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    fetchTaskData();
+    fetchTaskData()
   }, []);
 
   useEffect(() => {
@@ -65,49 +65,40 @@ const WeeklyDigest = ({ navigation }) => {
       const dueDate = task.due_date.toDate();
       return isWithinInterval(dueDate, { start: weekStart, end: weekEnd });
     });
-    
     // Tasks completed this week
-    const completedThisWeek = tasks.filter(task => 
-      task.is_completed && 
-      task.due_date && 
+    const completedThisWeek = tasks.filter(task =>
+      task.is_completed &&
+      task.due_date &&
       isWithinInterval(task.due_date.toDate(), { start: weekStart, end: weekEnd })
     );
-    
     // Tasks due in the coming week
     const nextWeekStart = addDays(weekEnd, 1);
     const nextWeekEnd = addDays(nextWeekStart, 6);
-    const upcomingTasks = tasks.filter(task => 
-      !task.is_completed && 
-      task.due_date && 
+    const upcomingTasks = tasks.filter(task =>
+      !task.is_completed &&
+      task.due_date &&
       isWithinInterval(task.due_date.toDate(), { start: nextWeekStart, end: nextWeekEnd })
     );
-    
     // Calculate daily completions for the week
     const dailyCompletions = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-    
     completedThisWeek.forEach(task => {
       const dueDate = task.due_date.toDate();
       const dayOfWeek = dueDate.getDay(); // 0 = Sunday, 6 = Saturday
       dailyCompletions[dayOfWeek]++;
     });
-    
     // Calculate completion rate
-    const completionRate = currentWeekTasks.length > 0 
-      ? Math.round((completedThisWeek.length / currentWeekTasks.length) * 100) 
+    const completionRate = currentWeekTasks.length > 0
+      ? Math.round((completedThisWeek.length / currentWeekTasks.length) * 100)
       : 0;
-    
     // Calculate productivity by hour (when tasks are completed)
     const hourlyCompletions = Array(24).fill(0);
     let hasCompletionTimeData = false;
-    
     // Filter tasks that have completed_time data
-    const tasksWithCompletionTime = tasks.filter(task => 
+    const tasksWithCompletionTime = tasks.filter(task =>
       task.is_completed && task.completed_time
     );
-    
     if (tasksWithCompletionTime.length > 0) {
       hasCompletionTimeData = true;
-      
       tasksWithCompletionTime.forEach(task => {
         try {
           const completionTime = parseISO(task.completed_time);
@@ -118,14 +109,12 @@ const WeeklyDigest = ({ navigation }) => {
         }
       });
     }
-    
     // Find the most productive hours (top 3)
     const productivityHours = hourlyCompletions
       .map((count, hour) => ({ hour, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3)
       .filter(item => item.count > 0);
-    
     setStats({
       totalTasks: currentWeekTasks.length,
       completedTasks: completedThisWeek.length,
@@ -177,12 +166,12 @@ const WeeklyDigest = ({ navigation }) => {
           <Text style={[styles.statValue, { color: theme.colors.text }]}>{stats.completedTasks}</Text>
           <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>Completed</Text>
         </View>
-        
+
         <View style={styles.statCard}>
           <Text style={[styles.statValue, { color: theme.colors.text }]}>{stats.totalTasks}</Text>
           <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>Total Tasks</Text>
         </View>
-        
+
         <View style={styles.statCard}>
           <Text style={[styles.statValue, { color: theme.colors.text }]}>{stats.completionRate}%</Text>
           <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>Completion Rate</Text>
@@ -197,7 +186,7 @@ const WeeklyDigest = ({ navigation }) => {
       {/* Productivity section */}
       <View style={[styles.productivityContainer, { backgroundColor: theme.colors.card }]}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Your Productivity Hours</Text>
-        
+
         {!stats.hasCompletionTimeData || stats.productivityHours.length === 0 ? (
           <Text style={[styles.noDataText, { color: theme.colors.secondaryText }]}>
             Not enough information for this report.
@@ -207,7 +196,7 @@ const WeeklyDigest = ({ navigation }) => {
             <Text style={[styles.productivityIntro, { color: theme.colors.text }]}>
               You're most productive during:
             </Text>
-            
+
             {stats.productivityHours.map((item, index) => (
               <View key={index} style={styles.productivityTimeSlot}>
                 <View style={[styles.timeIndicator, { backgroundColor: theme.colors.primary }]}>
@@ -240,7 +229,7 @@ const WeeklyDigest = ({ navigation }) => {
         />
       </View>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.refreshButton, { backgroundColor: theme.colors.primary }]}
         onPress={fetchTaskData}
       >
@@ -387,34 +376,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 8,
   },
-  locationsContainer: {
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginTop: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  locationItem: {
-    marginBottom: 16,
-  },
-  locationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  locationName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  locationRate: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   progressBarContainer: {
     height: 8,
     borderRadius: 4,
@@ -422,10 +383,6 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-  },
-  locationStats: {
-    fontSize: 14,
-    marginTop: 6,
   },
   refreshButton: {
     flexDirection: 'row',

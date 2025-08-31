@@ -18,7 +18,7 @@ const Profile = ({ navigation }) => {
   const [imageLoadError, setImageLoadError] = useState(false);
 
   useEffect(() => {
-    fetchUserProfile();
+    fetchUserProfile()
   }, []);
 
   const fetchUserProfile = async () => {
@@ -218,22 +218,18 @@ const Profile = ({ navigation }) => {
       if (!response.ok) {
         throw new Error('Could not access the selected image');
       }
-      
       const blob = await response.blob();
-      
       // Validate blob size (max 5MB)
       if (blob.size > 5 * 1024 * 1024) {
         throw new Error('Image is too large. Please select an image smaller than 5MB.');
       }
-
       // Validate MIME type
       if (!blob.type.startsWith('image/')) {
         throw new Error('Selected file is not a valid image');
       }
-      
       const fileExtension = blob.type.split('/')[1] || 'jpg';
 
-      // Upload to Firebase Firestore with retry logic
+      // Upload to Firestore with retry logic
       let uploadAttempts = 0;
       const maxAttempts = 3;
       let uploadError;
@@ -274,18 +270,15 @@ const Profile = ({ navigation }) => {
       if (!validateResponse.ok) {
         throw new Error('Uploaded image is not accessible');
       }
-
       console.log('Uploaded image URL:', publicUrl);
       // Update profile with new avatar URL
       await user.updateProfile({
         photoURL: publicUrl
       });
-
       // Update local state
       setAvatarUrl(publicUrl);
       setImageLoadError(false);
       Alert.alert('Success', 'Profile picture updated successfully');
-
     } catch (error) {
       console.error('Error uploading image:', error);
       Alert.alert('Error', `Failed to upload image: ${error.message}`);
@@ -336,7 +329,6 @@ const Profile = ({ navigation }) => {
                       Alert.alert('Error', 'You must be logged in to delete your account');
                       return;
                     }
-
                     // Delete avatar from storage if exists
                     if (avatarUrl) {
                       try {
@@ -347,7 +339,6 @@ const Profile = ({ navigation }) => {
                         console.warn('Could not delete avatar from storage:', error);
                       }
                     }
-
                     await user.reauthenticateWithCredential(
                       firebase.auth.EmailAuthProvider.credential(user.email, password)
                     );
@@ -411,7 +402,7 @@ const Profile = ({ navigation }) => {
               </View>
             )}
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.editImageButton}
             onPress={pickImage}
             disabled={uploadingImage}
@@ -423,9 +414,9 @@ const Profile = ({ navigation }) => {
         <View style={styles.profileInfo}>
           {isEditing ? (
             <TextInput
-              style={[styles.usernameInput, { 
-                color: theme.colors.text, 
-                borderColor: theme.colors.border 
+              style={[styles.usernameInput, {
+                color: theme.colors.text,
+                borderColor: theme.colors.border
               }]}
               value={newUsername}
               onChangeText={setNewUsername}
@@ -444,7 +435,7 @@ const Profile = ({ navigation }) => {
 
         {isEditing ? (
           <View style={styles.editButtonsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.colors.secondary }]}
               onPress={() => {
                 setNewUsername(username);
@@ -453,7 +444,7 @@ const Profile = ({ navigation }) => {
             >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.colors.primary }]}
               onPress={handleSaveProfile}
               disabled={saving}
@@ -466,7 +457,7 @@ const Profile = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.editButton, { backgroundColor: theme.colors.primary }]}
             onPress={() => setIsEditing(true)}
           >
@@ -479,7 +470,7 @@ const Profile = ({ navigation }) => {
       <View style={[styles.settingsSection, { backgroundColor: theme.colors.card }]}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Settings</Text>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.settingItem}
           onPress={() => navigation.navigate('ChangePassword')}
         >
@@ -491,7 +482,7 @@ const Profile = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.deleteAccountButton, { backgroundColor: '#FF3B30' }]}
         onPress={handleDeleteAccount}
         disabled={deleting}

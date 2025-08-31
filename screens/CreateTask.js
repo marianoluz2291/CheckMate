@@ -6,7 +6,6 @@ import { firebase } from '../config';
 import * as ImagePicker from 'expo-image-picker';
 
 const CreateTask = ({ navigation, route }) => {
-
   const { theme } = useContext(ThemeContext);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dueDate, setDueDate] = useState(null);
@@ -19,7 +18,6 @@ const CreateTask = ({ navigation, route }) => {
   // Date picker state
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -30,16 +28,13 @@ const CreateTask = ({ navigation, route }) => {
   useEffect(() => {
     const getCurrentUser = async () => {
       const user = firebase.auth().currentUser;
-
       if (!user) {
         Alert.alert('Error', 'User not authenticated');
         navigation.navigate('Login');
         return;
       }
-
       setUserId(user.uid);
     };
-
     getCurrentUser();
   }, []);
 
@@ -47,7 +42,6 @@ const CreateTask = ({ navigation, route }) => {
     (async () => {
       const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
       const mediaLibraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
       if (cameraPermission.status !== 'granted' || mediaLibraryPermission.status !== 'granted') {
         Alert.alert('Permission Required', 'Camera and media library access is needed to attach photos to tasks.');
       }
@@ -59,12 +53,10 @@ const CreateTask = ({ navigation, route }) => {
       Alert.alert('Error', 'Please enter a task title');
       return;
     }
-
     if (!userId) {
       Alert.alert('Error', 'User is not authenticated');
       return;
     }
-
     createTask();
   };
 
@@ -79,7 +71,6 @@ const CreateTask = ({ navigation, route }) => {
         due_status: dueDate ? dueDate < new Date() : false,
         user_id: userId,
       };
-
       // If there's a photo, upload it first
       if (photo) {
         const photoUrl = await uploadPhoto(photo);
@@ -87,12 +78,10 @@ const CreateTask = ({ navigation, route }) => {
           taskData.photo_url = photoUrl;
         }
       }
-
       // Insert the task data
       const { data, error } = await firebase.firestore()
         .collection('tasks')
         .add(taskData);
-
       if (error) {
         console.error('Error creating task:', error);
         Alert.alert('Error', 'Failed to create task: ' + error.message);
@@ -109,7 +98,6 @@ const CreateTask = ({ navigation, route }) => {
 
   const uploadPhoto = async (photoUri) => {
     if (!photoUri) return null;
-
     try {
       setUploading(true);
       console.log('Skipping actual upload in development, using local URI for testing');
@@ -131,7 +119,6 @@ const CreateTask = ({ navigation, route }) => {
         aspect: [4, 3],
         quality: 0.8,
       });
-      
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setPhoto(result.assets[0].uri);
       }
@@ -149,7 +136,6 @@ const CreateTask = ({ navigation, route }) => {
         aspect: [4, 3],
         quality: 0.8,
       });
-      
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setPhoto(result.assets[0].uri);
       }
@@ -166,17 +152,17 @@ const CreateTask = ({ navigation, route }) => {
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
   };
-  
+
   const getFirstDayOfMonth = (month, year) => {
     return new Date(year, month, 1).getDay();
   };
-  
+
   const handleDateSelect = (day) => {
     const newDate = new Date(selectedYear, selectedMonth, day);
     setDueDate(newDate);
     setShowDatePicker(false);
   };
-  
+
   const formatDate = (date) => {
     if (!date) return '';
     const day = date.getDate();
@@ -197,7 +183,7 @@ const CreateTask = ({ navigation, route }) => {
       setSelectedMonth(dueDate.getMonth());
     }
   };
-  
+
   const goToPreviousMonth = () => {
     if (selectedMonth === 0) {
       setSelectedMonth(11);
@@ -206,7 +192,7 @@ const CreateTask = ({ navigation, route }) => {
       setSelectedMonth(selectedMonth - 1);
     }
   };
-  
+
   const goToNextMonth = () => {
     if (selectedMonth === 11) {
       setSelectedMonth(0);
@@ -246,7 +232,7 @@ const CreateTask = ({ navigation, route }) => {
         {/* Task Title */}
         <View style={styles.inputContainer}>
           <Feather name="file-text" size={20} color={theme.colors.primary} style={styles.inputIcon} />
-          <TextInput 
+          <TextInput
             style={[styles.input, { color: theme.colors.text }]}
             placeholder="Task title"
             placeholderTextColor={theme.colors.secondaryText}
@@ -281,15 +267,15 @@ const CreateTask = ({ navigation, route }) => {
         </TouchableOpacity>
 
         {/* Photo Attachment */}
-        <TouchableOpacity 
-          style={styles.selectorContainer} 
+        <TouchableOpacity
+          style={styles.selectorContainer}
           onPress={photo ? removePhoto : showImageOptions}
         >
-          <Feather 
-            name={photo ? "image" : "camera"} 
-            size={20} 
-            color={theme.colors.primary} 
-            style={styles.inputIcon} 
+          <Feather
+            name={photo ? "image" : "camera"}
+            size={20}
+            color={theme.colors.primary}
+            style={styles.inputIcon}
           />
           <Text style={[styles.selectorText, { color: photo ? theme.colors.text : theme.colors.secondaryText }]}>
             {photo ? 'Photo attached' : 'Attach photo'}
@@ -306,9 +292,9 @@ const CreateTask = ({ navigation, route }) => {
         {/* Photo Preview */}
         {photo && (
           <View style={styles.photoPreviewContainer}>
-            <Image 
-              source={{ uri: photo }} 
-              style={styles.photoPreview} 
+            <Image
+              source={{ uri: photo }}
+              style={styles.photoPreview}
               resizeMode="cover"
             />
             <View style={styles.photoActions}>
@@ -324,9 +310,9 @@ const CreateTask = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[
-          styles.createButton, 
+          styles.createButton,
           { backgroundColor: theme.colors.primary },
           uploading && { opacity: 0.7 }
         ]}
@@ -345,12 +331,12 @@ const CreateTask = ({ navigation, route }) => {
         animationType="fade"
         onRequestClose={() => setShowDatePicker(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setShowDatePicker(false)}
         >
-          <View 
+          <View
             style={[styles.datePickerContainer, { backgroundColor: theme.colors.card }]}
             onStartShouldSetResponder={() => true}
             onResponderGrant={(evt) => evt.stopPropagation()}
@@ -366,7 +352,6 @@ const CreateTask = ({ navigation, route }) => {
                 <Feather name="chevron-right" size={24} color={theme.colors.primary} />
               </TouchableOpacity>
             </View>
-            
             <View style={styles.weekdaysContainer}>
               {daysOfWeek.map(day => (
                 <Text key={day} style={[styles.weekdayLabel, { color: theme.colors.secondaryText }]}>
@@ -374,13 +359,12 @@ const CreateTask = ({ navigation, route }) => {
                 </Text>
               ))}
             </View>
-            
             <View style={styles.daysGrid}>
               {/* Empty cells for days before the first day of month */}
               {Array.from({ length: getFirstDayOfMonth(selectedMonth, selectedYear) }).map((_, index) => (
                 <View key={`empty-${index}`} style={styles.dayCell} />
               ))}
-              
+
               {/* Days of the month */}
               {Array.from({ length: getDaysInMonth(selectedMonth, selectedYear) }).map((_, index) => {
                 const day = index + 1;
@@ -391,7 +375,7 @@ const CreateTask = ({ navigation, route }) => {
                   dueDate.getFullYear() === selectedYear;
 
                 const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
-                
+
                 return (
                   <TouchableOpacity
                     key={day}
@@ -416,7 +400,7 @@ const CreateTask = ({ navigation, route }) => {
               })}
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.clearDateButton, { borderColor: theme.colors.primary }]}
               onPress={() => {
                 setDueDate(null);
@@ -500,18 +484,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 12,
   },
-  warningContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  warningText: {
-    flex: 1,
-    fontSize: 14,
-    marginLeft: 8,
-  },
   photoPreviewContainer: {
     marginTop: 16,
     marginBottom: 16,
@@ -568,13 +540,6 @@ const styles = StyleSheet.create({
   datePickerTitle: {
     fontSize: 18,
     fontWeight: '600',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  loadingText: {
-    fontSize: 14,
   },
   weekdaysContainer: {
     flexDirection: 'row',

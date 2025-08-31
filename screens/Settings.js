@@ -37,15 +37,15 @@ Notifications.setNotificationHandler({
 });
 
 export default function Settings() {
-  const { 
-    isDarkMode, 
-    setIsDarkMode, 
-    themeColor, 
-    setThemeColor, 
+  const {
+    isDarkMode,
+    setIsDarkMode,
+    themeColor,
+    setThemeColor,
     themeColors,
-    theme 
+    theme
   } = useContext(ThemeContext);
-  
+
   const navigation = useNavigation();
   const [notifications, setNotifications] = useState(true);
   const [soundEffects, setSoundEffects] = useState(true);
@@ -76,28 +76,22 @@ useEffect(() => {
     try {
       // Get current user
       const user = firebase.auth().currentUser;
-
       if (!user) {
         console.log('No user found');
         return;
       }
-
       // Set email from session immediately
       setUserEmail(user.email || 'example@email.com');
-
       // Try to fetch the profile
       const { data, error } = await firebase.firestore()
         .collection('profiles')
         .doc(user.uid)
         .get();
-
       if (error) {
         console.log('Profile not found, creating new profile');
-        
         // Create default username from email
         const defaultUsername = user.email.split('@')[0];
         setUserName(defaultUsername);
-        
         // Insert new profile
         const { error: insertError } = await firebase.firestore()
           .collection('profiles')
@@ -106,7 +100,6 @@ useEffect(() => {
             username: defaultUsername,
             updated_at: new Date()
           });
-
         if (insertError) {
           console.error('Error creating profile:', insertError.message);
           setUserName('Your Name');
@@ -159,41 +152,33 @@ useEffect(() => {
         console.log('Notifications are not supported on web platforms');
         return;
       }
-      
       // For Android/iOS, check if we're running on a physical device
       // Safely check for Constants.isDevice with fallback
       const isPhysicalDevice = Platform.OS === 'ios' || Platform.OS === 'android';
-      
       if (!isPhysicalDevice) {
         setPermissionStatus('simulator');
         console.log('Running in simulator/emulator environment');
         return;
       }
-
       // Check existing permissions
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       setPermissionStatus(existingStatus);
-      
       let finalStatus = existingStatus;
-      
       // If no existing permission, ask user
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
         setPermissionStatus(status);
       }
-      
       // If still not granted, we can't proceed
       if (finalStatus !== 'granted') {
         return;
       }
-      
       try {
         // Try to get the token, but handle potential failures gracefully
         const tokenResponse = await Notifications.getExpoPushTokenAsync({
           projectId: Constants.expoConfig?.extra?.eas?.projectId || "your-expo-project-id-here"
         });
-        
         if (tokenResponse?.data) {
           setPushToken(tokenResponse.data);
           console.log('Push token:', tokenResponse.data);
@@ -201,7 +186,6 @@ useEffect(() => {
       } catch (tokenError) {
         console.log('Error getting push token:', tokenError);
       }
-      
       // Set up notification handling if permissions are granted
       if (finalStatus === 'granted') {
         setupNotificationHandlers();
@@ -218,13 +202,11 @@ useEffect(() => {
       // You can handle incoming notifications here
       console.log('Notification received:', notification);
     });
-
     // Handle notification responses (when user taps notification)
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
       // You can handle notification responses here (e.g., navigate to a specific screen)
       console.log('Notification response:', response);
     });
-
     // Clean up the listeners on unmount
     return () => {
       Notifications.removeNotificationSubscription(notificationListener);
@@ -242,11 +224,10 @@ useEffect(() => {
       );
       return;
     }
-
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Welcome to BloomTask!",
+          title: "Welcome to CheckMate!",
           body: "Notifications are now enabled. You'll never miss an important task again!",
           data: { screen: 'Tasks' },
         },
@@ -268,17 +249,15 @@ useEffect(() => {
       );
       return;
     }
-
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "BloomTask Reminder",
+          title: "CheckMate Reminder",
           body: "Sample notification - This is how task reminders will look!",
           data: { screen: 'Tasks' },
         },
         trigger: { seconds: 5 },
       });
-
       Alert.alert(
         'Notification Scheduled',
         'You will receive a sample notification in 5 seconds!',
@@ -295,7 +274,6 @@ useEffect(() => {
     const newNotificationsState = !notifications;
     setPreviousNotificationState(notifications);
     setNotifications(newNotificationsState);
-    
     // If turning off, disable all notification types
     if (!newNotificationsState) {
       const updatedSettings = {
@@ -305,7 +283,7 @@ useEffect(() => {
       };
       setNotificationSettings(updatedSettings);
       saveNotificationSettings(updatedSettings);
-    } 
+    }
     // If turning on, and all were off, enable defaults
     else if (!Object.values(notificationSettings).some(value => value === true)) {
       const updatedSettings = {
@@ -321,7 +299,6 @@ useEffect(() => {
     if (newNotificationsState && permissionStatus !== 'granted') {
       await registerForPushNotifications();
     }
-    
     // Send a welcome notification when user enables notifications
     if (newNotificationsState && !previousNotificationState && permissionStatus === 'granted') {
       scheduleWelcomeNotification();
@@ -330,14 +307,12 @@ useEffect(() => {
 
   // Toggle individual notification types
   const toggleNotificationType = (type) => {
-    const updatedSettings = { 
+    const updatedSettings = {
       ...notificationSettings,
-      [type]: !notificationSettings[type] 
+      [type]: !notificationSettings[type]
     };
-    
     setNotificationSettings(updatedSettings);
     saveNotificationSettings(updatedSettings);
-    
     // Update main notifications toggle based on if any notification type is enabled
     setNotifications(Object.values(updatedSettings).some(value => value === true));
   };
@@ -354,8 +329,8 @@ useEffect(() => {
           text: "Cancel",
           style: "cancel"
         },
-        { 
-          text: "Log Out", 
+        {
+          text: "Log Out",
           style: "destructive",
           onPress: async () => {
             try {
@@ -418,30 +393,27 @@ useEffect(() => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      
       <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
         <Text style={[styles.headerTitle, { color: theme.colors.primary }]}>
           Settings
         </Text>
       </View>
-      
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContent}>
-        
         <TouchableOpacity 
-          style={[styles.profileContainer, { backgroundColor: theme.colors.card }]} 
+          style={[styles.profileContainer, { backgroundColor: theme.colors.card }]}
           onPress={handleProfilePress}
           activeOpacity={0.7}>
           <View style={styles.profileImageContainer}>
             {profilePicture ? (
               <Image 
-                source={{ uri: profilePicture }} 
-                style={styles.profileImage} 
+                source={{ uri: profilePicture }}
+                style={styles.profileImage}
               />
             ) : (
-              <View 
+              <View
                 style={[styles.profilePlaceholder, { backgroundColor: isDarkMode ? '#444' : '#FFF5F7' }]}>
                 <Feather name="user" size={isSmallDevice ? 30 : 40} color={theme.colors.primary} />
               </View>
@@ -457,14 +429,12 @@ useEffect(() => {
           </View>
           <Feather name="chevron-right" size={24} color={theme.colors.secondaryText} />
         </TouchableOpacity>
-        
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Theme
           </Text>
         </View>
-        
-        <View style={[styles.settingsSection, { 
+        <View style={[styles.settingsSection, {
           backgroundColor: theme.colors.card,
           shadowColor: isDarkMode ? "#000" : "#FFE0EB",
         }]}>
@@ -482,8 +452,7 @@ useEffect(() => {
               value={isDarkMode}
             />
           </View>
-          
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.settingItem}
             onPress={openColorPicker}
             activeOpacity={0.7}>
@@ -496,26 +465,24 @@ useEffect(() => {
             <View style={[styles.colorSample, { backgroundColor: themeColors[themeColor] }]} />
           </TouchableOpacity>
         </View>
-        
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Preferences
           </Text>
         </View>
-        
-        <View style={[styles.settingsSection, { 
+        <View style={[styles.settingsSection, {
           backgroundColor: theme.colors.card,
           shadowColor: isDarkMode ? "#000" : "#FFE0EB"
         }]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: theme.colors.border }]}
             onPress={() => permissionStatus === 'granted' ? openNotificationSettings() : registerForPushNotifications()}
             activeOpacity={0.7}>
             <View style={styles.settingTextContainer}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Notifications</Text>
               <Text style={[styles.settingDescription, { color: theme.colors.secondaryText }]}>
-                {permissionStatus === 'granted' 
-                  ? 'Customize your notifications' 
+                {permissionStatus === 'granted'
+                  ? 'Customize your notifications'
                   : 'Enable push notifications'}
               </Text>
             </View>
@@ -527,7 +494,7 @@ useEffect(() => {
                 value={notifications}
               />
               {permissionStatus === 'granted' && notifications && (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.customizeButton, { backgroundColor: theme.colors.primary + '20' }]}
                   onPress={openNotificationSettings}>
                   <Text style={[styles.customizeButtonText, { color: theme.colors.primary }]}>
@@ -537,7 +504,6 @@ useEffect(() => {
               )}
             </View>
           </TouchableOpacity>
-          
           <View style={styles.settingItem}>
             <View style={styles.settingTextContainer}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Sound Effects</Text>
@@ -553,19 +519,17 @@ useEffect(() => {
             />
           </View>
         </View>
-        
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Help & Support
           </Text>
         </View>
-        
-        <View style={[styles.settingsSection, { 
+        <View style={[styles.settingsSection, {
           backgroundColor: theme.colors.card,
-          shadowColor: isDarkMode ? "#000" : "#FFE0EB" 
+          shadowColor: isDarkMode ? "#000" : "#FFE0EB"
         }]}>
-          <TouchableOpacity 
-            style={[styles.linkItem, { borderBottomColor: theme.colors.border }]} 
+          <TouchableOpacity
+            style={[styles.linkItem, { borderBottomColor: theme.colors.border }]}
             onPress={handleSupportPress}
             activeOpacity={0.7}>
             <View style={styles.settingTextContainer}>
@@ -576,9 +540,8 @@ useEffect(() => {
             </View>
             <Feather name="chevron-right" size={24} color={theme.colors.secondaryText} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.linkItem} 
+          <TouchableOpacity
+            style={styles.linkItem}
             onPress={handleAboutPress}
             activeOpacity={0.7}>
             <View style={styles.settingTextContainer}>
@@ -590,9 +553,8 @@ useEffect(() => {
             <Feather name="chevron-right" size={24} color={theme.colors.secondaryText} />
           </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity 
-          style={[styles.logoutButton, { 
+        <TouchableOpacity
+          style={[styles.logoutButton, {
             backgroundColor: theme.colors.card,
             shadowColor: isDarkMode ? "#000" : "#FFE0EB"
           }]}
@@ -601,7 +563,7 @@ useEffect(() => {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
-      
+
       {/* Color Theme Picker Modal */}
       <Modal
         animationType="slide"
@@ -609,7 +571,7 @@ useEffect(() => {
         visible={colorPickerVisible}
         onRequestClose={() => setColorPickerVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.colorPickerContainer, { 
+          <View style={[styles.colorPickerContainer, {
             backgroundColor: theme.colors.card,
             shadowColor: isDarkMode ? "#000" : "#FFE0EB"
           }]}>
@@ -617,13 +579,12 @@ useEffect(() => {
               <Text style={[styles.colorPickerTitle, { color: theme.colors.text }]}>
                 Choose Theme Color
               </Text>
-              <TouchableOpacity 
-                onPress={() => setColorPickerVisible(false)} 
+              <TouchableOpacity
+                onPress={() => setColorPickerVisible(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Feather name="x" size={24} color={theme.colors.secondaryText} />
               </TouchableOpacity>
             </View>
-            
             <View style={styles.colorOptions}>
               {Object.keys(themeColors).map((color) => (
                 <TouchableOpacity
@@ -655,7 +616,7 @@ useEffect(() => {
         visible={notificationModalVisible}
         onRequestClose={() => setNotificationModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.notificationModalContainer, { 
+          <View style={[styles.notificationModalContainer, {
             backgroundColor: theme.colors.card,
             shadowColor: isDarkMode ? "#000" : "#FFE0EB"
           }]}>
@@ -663,13 +624,12 @@ useEffect(() => {
               <Text style={[styles.colorPickerTitle, { color: theme.colors.text }]}>
                 Notification Settings
               </Text>
-              <TouchableOpacity 
-                onPress={() => setNotificationModalVisible(false)} 
+              <TouchableOpacity
+                onPress={() => setNotificationModalVisible(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Feather name="x" size={24} color={theme.colors.secondaryText} />
               </TouchableOpacity>
             </View>
-            
             <View style={styles.notificationOptionsContainer}>
               <View style={[styles.notificationOption, { borderBottomColor: theme.colors.border }]}>
                 <View style={styles.settingTextContainer}>
@@ -685,7 +645,6 @@ useEffect(() => {
                   value={notificationSettings.taskReminders}
                 />
               </View>
-              
               <View style={[styles.notificationOption, { borderBottomColor: theme.colors.border }]}>
                 <View style={styles.settingTextContainer}>
                   <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Daily Summary</Text>
@@ -700,7 +659,6 @@ useEffect(() => {
                   value={notificationSettings.dailySummary}
                 />
               </View>
-              
               <View style={styles.notificationOption}>
                 <View style={styles.settingTextContainer}>
                   <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Weekly Digest</Text>
@@ -717,20 +675,20 @@ useEffect(() => {
               </View>
             </View>
             <View style={styles.notificationOption}>
-  <View style={styles.settingTextContainer}>
-    <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Inactivity Reminder</Text>
-    <Text style={[styles.settingDescription, { color: theme.colors.secondaryText }]}>
-      Notify when you haven't opened the app for a day
-    </Text>
-  </View>
-  <Switch
-    trackColor={{ false: "#E0E0E0", true: theme.colors.primary + "80" }}
-    thumbColor={notificationSettings.inactivityReminder ? theme.colors.primary : "#f4f3f4"}
-    onValueChange={() => toggleNotificationType('inactivityReminder')}
-    value={notificationSettings.inactivityReminder}
-  />
-</View>
-            <TouchableOpacity 
+              <View style={styles.settingTextContainer}>
+                <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Inactivity Reminder</Text>
+                <Text style={[styles.settingDescription, { color: theme.colors.secondaryText }]}>
+                  Notify when you haven't opened the app for a day
+                </Text>
+              </View>
+              <Switch
+                trackColor={{ false: "#E0E0E0", true: theme.colors.primary + "80" }}
+                thumbColor={notificationSettings.inactivityReminder ? theme.colors.primary : "#f4f3f4"}
+                onValueChange={() => toggleNotificationType('inactivityReminder')}
+                value={notificationSettings.inactivityReminder}
+              />
+            </View>
+            <TouchableOpacity
               style={[styles.testNotificationButton, { backgroundColor: theme.colors.primary }]}
               onPress={scheduleNotification}>
               <Text style={styles.testNotificationText}>Test Notification</Text>

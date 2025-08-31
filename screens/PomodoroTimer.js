@@ -18,26 +18,23 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
     } else {
       clearInterval(intervalRef.current);
     }
-
     return () => clearInterval(intervalRef.current);
   }, [isActive, timeLeft]);
 
   const handleTimerComplete = () => {
     setIsActive(false);
-    
     if (!isBreak) {
       // Work session completed
       const newPomodoroCount = completedPomodoros + 1;
       setCompletedPomodoros(newPomodoroCount);
-      
+
       // Update task with new pomodoro count
       onUpdateTask(task.id, { pomodoros: newPomodoroCount });
-      
+
       // Start break timer
       const breakTime = newPomodoroCount % 4 === 0 ? 15 * 60 : 5 * 60; // Long break every 4 pomodoros
       setTimeLeft(breakTime);
       setIsBreak(true);
-      
       Alert.alert(
         "Work Session Complete! 🍅",
         `Great job! You've completed ${newPomodoroCount} pomodoro${newPomodoroCount > 1 ? 's' : ''} on "${task.title}". Time for a ${breakTime === 900 ? 'long' : 'short'} break!`,
@@ -57,7 +54,6 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
         ]
       );
     }
-    
     if (onPomodoroComplete) {
       onPomodoroComplete(task.id, !isBreak);
     }
@@ -102,7 +98,6 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
           🍅 {completedPomodoros} pomodoro{completedPomodoros !== 1 ? 's' : ''} completed
         </Text>
       </View>
-      
       <View style={[styles.timerCircle, { borderColor: getTimerColor() }]}>
         <Text style={[styles.timerText, { color: getTimerColor() }]}>
           {formatTime(timeLeft)}
@@ -111,9 +106,8 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
           {isBreak ? (timeLeft > 10 * 60 ? 'Long Break' : 'Short Break') : 'Focus Time'}
         </Text>
       </View>
-      
       <View style={styles.controls}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.button, styles.primaryButton, { backgroundColor: getTimerColor() }]}
           onPress={toggleTimer}
         >
@@ -121,8 +115,7 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
             {isActive ? 'Pause' : 'Start'}
           </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
           onPress={resetTimer}
         >
@@ -131,19 +124,19 @@ const PomodoroTimer = ({ task, onPomodoroComplete, onUpdateTask, theme }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Progress indicator */}
       <View style={styles.progressContainer}>
         <Text style={styles.progressText}>Session Progress</Text>
         <View style={styles.progressBar}>
           <View 
             style={[
-              styles.progressFill, 
-              { 
+              styles.progressFill,
+              {
                 width: `${((isBreak ? (completedPomodoros % 4 === 0 ? 15 * 60 : 5 * 60) : 25 * 60) - timeLeft) / (isBreak ? (completedPomodoros % 4 === 0 ? 15 * 60 : 5 * 60) : 25 * 60) * 100}%`,
                 backgroundColor: getTimerColor()
               }
-            ]} 
+            ]}
           />
         </View>
       </View>

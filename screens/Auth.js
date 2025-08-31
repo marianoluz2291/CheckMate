@@ -1,8 +1,6 @@
 import { View, Text, StyleSheet, AppState, Alert, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../config';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Input } from '@rneui/themed'
 import { Ionicons } from '@expo/vector-icons'
 
@@ -16,8 +14,6 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-
   const loginUser = async (email, password) => {
     try {
         await firebase.auth().signInWithEmailAndPassword(email, password)
@@ -26,35 +22,35 @@ export default function Auth() {
     }
   };
 
-    const registerUser = async (email, password) => {
-        await firebase.auth().createUserWithEmailAndPassword(email, password)
+  const registerUser = async (email, password) => {
+      await firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        firebase.auth().currentUser.sendEmailVerification({
+            handleCodeInApp: true,
+            url: 'https://checkmate-141f1.firebaseapp.com'
+        })
         .then(() => {
-          firebase.auth().currentUser.sendEmailVerification({
-              handleCodeInApp: true,
-              url: 'https://checkmate-141f1.firebaseapp.com'
-          })
-          .then(() => {
-              alert('Verification email sent. Please check your inbox.')
-          }).catch((error) => {
-              console.error('Error sending email verification:', error)
-          })
-          .then(() => {
-              firebase.firestore().collection('users')
-              .doc(firebase.auth().currentUser.uid)
-              .set({
-                  email,
-                  displayName: null,
-                  photoURL: null
-              })
-          })
-          .catch((error) => {
-              console.error('Error adding user to Firestore:', error)
-          })
-      })
-      .catch((error) => {
-          alert(error.message)
-      })
-    }
+            alert('Verification email sent. Please check your inbox.')
+        }).catch((error) => {
+            console.error('Error sending email verification:', error)
+        })
+        .then(() => {
+            firebase.firestore().collection('users')
+            .doc(firebase.auth().currentUser.uid)
+            .set({
+                email,
+                displayName: null,
+                photoURL: null
+            })
+        })
+        .catch((error) => {
+            console.error('Error adding user to Firestore:', error)
+        })
+    })
+    .catch((error) => {
+        alert(error.message)
+    })
+  }
 
   return (
     <View style={styles.container}>
@@ -66,7 +62,6 @@ export default function Auth() {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Sign In/Sign Up</Text>
-
         <View style={styles.inputContainer}>
           <Input
             containerStyle={styles.input}
@@ -78,7 +73,6 @@ export default function Auth() {
             autoCapitalize={'none'}
             placeholderTextColor="#BBBBBB"
           />
-
           <View style={styles.passwordContainer}>
             <Input
               containerStyle={styles.passwordInput}
@@ -115,7 +109,6 @@ export default function Auth() {
             buttonStyle={styles.signInButton}
             titleStyle={styles.buttonText}
           />
-
           <Button
             title="Sign Up"
             onPress={() => registerUser(email, password)}

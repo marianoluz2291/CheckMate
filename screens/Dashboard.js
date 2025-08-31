@@ -1,19 +1,14 @@
 // screens/Dashboard.js
 import React, { useState, useContext, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  SafeAreaView, 
-  TouchableOpacity, 
-  FlatList, 
-  TextInput,
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  FlatList,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
-  Animated,
-  Dimensions,
-  TouchableWithoutFeedback,
   Image,
   RefreshControl,
   Alert,
@@ -34,7 +29,7 @@ const CATEGORY_ICONS = {
   home: "home",
   default: "tasks"
 };
-// Define default colors in case we can't fetch them from the database
+// Define default colors for categories
 const DEFAULT_CATEGORY_COLORS = {
   work: "#4285F4",
   personal: "#EA4335",
@@ -55,8 +50,7 @@ export default function Dashboard({ navigation }) {
 
   // Fetch tasks and categories on mount
   useEffect(() => {
-    fetchTasks();
-    fetchCategories();
+    fetchTasks()
   }, []);
 
   useEffect(() => {
@@ -72,42 +66,6 @@ export default function Dashboard({ navigation }) {
       getCurrentUser();
     }, []);
 
-  // Fetch categories including colors from Firebase
-const fetchCategories = async () => {
-  try {
-    firebase.firestore().collection('tasks').onSnapshot((querySnapshot) => {
-        const tasks = [];
-        querySnapshot.forEach((doc) => {
-          tasks.push({ id: doc.id, ...doc.data() });
-        });
-        // Process tasks
-        const colorsFromDB = {};
-        if (tasks && tasks.length > 0) {
-          // Transform the data into a format we can use
-          tasks.forEach(task => {
-            // Use cat_name instead of name to match your database schema
-            colorsFromDB[task.cat_name] = task.color;
-          });
-        }
-
-        // Make sure we have a 'default' category
-        if (!colorsFromDB.default) {
-          colorsFromDB.default = DEFAULT_CATEGORY_COLORS.default;
-        } else console.log('Categories fetched:', colorsFromDB);
-
-        // Update state with colors from database
-        setCategoryColors(prevColors => ({
-          ...prevColors,  // Keep default colors as fallback
-          ...colorsFromDB  // Override with colors from DB
-        }));
-      });
-    } catch (err) {
-      console.error('Unexpected error fetching categories:', err);
-      // We'll use the default colors if there's an error
-      setCategoryColors(DEFAULT_CATEGORY_COLORS);
-    }
-  }
-
   const fetchTasks = async () => {
     try {
       setIsRefreshing(true);
@@ -122,7 +80,6 @@ const fetchCategories = async () => {
           text: doc.title,
           completed: doc.is_completed,
           image: doc.image_url || null,
-          category: doc.category || 'default',
         }));
         setTasks(formattedTasks);
         setIsRefreshing(false);
@@ -134,7 +91,6 @@ const fetchCategories = async () => {
 
   const onRefresh = () => {
     fetchTasks();
-    fetchCategories(); // Also refresh categories when pulling to refresh
   };
 
   const navigateToTaskDetail = (taskId) => {
@@ -158,12 +114,12 @@ const fetchCategories = async () => {
   const toggleComplete = async (id) => {
     const task = tasks.find(t => t.id === id);
     if (!task || updatingTaskIds.includes(id)) return;
-    
+
     // Add this task ID to the updating list
     setUpdatingTaskIds(prev => [...prev, id]);
-    
+
     // Optimistic UI update - update the UI immediately before the server responds
-    setTasks(prev => 
+    setTasks(prev =>
       prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
     );
 
@@ -188,7 +144,7 @@ const fetchCategories = async () => {
   const pickImage = async (taskId) => {
     // Request permissions
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to add images!');
       return;
@@ -221,29 +177,6 @@ const fetchCategories = async () => {
     }
   };
 
-  // const changeTaskCategory = async (taskId, category) => {
-  //   try {
-  //     const { error } = await firebase.firestore()
-  //       .collection('tasks')
-  //       .doc(taskId)
-  //       .update({ category });
-
-  //     if (error) {
-  //       console.error('Error updating task category:', error);
-  //       Alert.alert('Error', 'Failed to update task category. Please try again.');
-  //     } else {
-  //       setTasks(prev => 
-  //         prev.map(task => 
-  //           task.id === taskId ? { ...task, category } : task
-  //         )
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.error('Unexpected error updating category:', err);
-  //     Alert.alert('Error', 'Something went wrong while updating the category.');
-  //   }
-  // };
-
   const getPendingTaskCount = () => {
     return tasks.filter(task => !task.completed).length;
   };
@@ -259,14 +192,14 @@ const fetchCategories = async () => {
         />
       );
     } else {
-      // If no image, show a category icon with background color
-      const iconName = CATEGORY_ICONS[task.category] || CATEGORY_ICONS.default;
-      
+      // If no image, show a default icon with background color
+      const iconName = CATEGORY_ICONS.default;
+
       // Use color from our dynamically loaded categoryColors state
-      const backgroundColor = categoryColors[task.category] || categoryColors.default;
-      
+      const backgroundColor = categoryColors.default;
+
       return (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.taskIconContainer, { backgroundColor }]}
           onPress={() => pickImage(task.id)}
           accessibilityLabel={`Add image to task: ${task.text}`}
@@ -282,9 +215,9 @@ const fetchCategories = async () => {
     const isUpdating = updatingTaskIds.includes(item.id);
 
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[
-          styles.taskContainer, 
+          styles.taskContainer,
           { backgroundColor: theme.colors.card }
         ]}
         accessible={true}
@@ -293,7 +226,7 @@ const fetchCategories = async () => {
         onPress={() => navigateToTaskDetail(item.id)}
         disabled={isUpdating}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.taskThumbnailContainer}
           onPress={() => pickImage(item.id)}
           accessibilityLabel="Tap to add or change task image"
@@ -303,7 +236,7 @@ const fetchCategories = async () => {
         </TouchableOpacity>
 
         <View style={styles.taskContentContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.taskCheckbox}
             onPress={(e) => {
               e.stopPropagation(); // Prevent triggering the parent's onPress
@@ -312,16 +245,16 @@ const fetchCategories = async () => {
             disabled={isUpdating}
             accessibilityLabel={item.completed ? "Mark as not completed" : "Mark as completed"}
             accessibilityRole="checkbox"
-            accessibilityState={{ 
+            accessibilityState={{
               checked: item.completed,
               busy: isUpdating
             }}
           >
             {isUpdating ? (
               // Show a different icon or opacity when updating
-              <MaterialIcons 
-                name={item.completed ? "check-circle" : "radio-button-unchecked"} 
-                size={24} 
+              <MaterialIcons
+                name={item.completed ? "check-circle" : "radio-button-unchecked"}
+                size={24}
                 color={theme.colors.primary}
                 style={{ opacity: 0.5 }}
               />
@@ -334,9 +267,9 @@ const fetchCategories = async () => {
 
           <View style={styles.taskTextRow}>
             <View style={styles.taskTextContainer}>
-              <Text 
+              <Text
                 style={[
-                  styles.taskText, 
+                  styles.taskText,
                   { color: theme.colors.text },
                   item.completed && styles.completedTaskText,
                   isUpdating && { opacity: 0.7 }
@@ -351,7 +284,7 @@ const fetchCategories = async () => {
             <TouchableOpacity
               style={styles.actionButton}
               onPress={(e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 deleteTask(item.id);
               }}
               disabled={isUpdating}
@@ -359,10 +292,10 @@ const fetchCategories = async () => {
               accessibilityHint="Removes this task from your list"
               accessibilityRole="button"
             >
-              <Feather 
-                name="trash-2" 
-                size={18} 
-                color={theme.colors.primary} 
+              <Feather
+                name="trash-2"
+                size={18}
+                color={theme.colors.primary}
                 style={isUpdating ? { opacity: 0.5 } : null}
               />
             </TouchableOpacity>
@@ -398,21 +331,21 @@ const fetchCategories = async () => {
 
         <View style={styles.headerRightContainer}>
           <TouchableOpacity 
-            style={styles.refreshButton} 
+            style={styles.refreshButton}
             onPress={onRefresh}
             disabled={isRefreshing}
             accessibilityLabel="Refresh tasks"
             accessibilityHint="Tap to refresh your task list"
           >
-            <Feather 
-              name="refresh-cw" 
-              size={22} 
-              color={theme.colors.primary} 
+            <Feather
+              name="refresh-cw"
+              size={22}
+              color={theme.colors.primary}
               style={isRefreshing ? styles.refreshingIcon : null}
             />
           </TouchableOpacity>
-          
-          <View style={[styles.summaryContainer, { 
+
+          <View style={[styles.summaryContainer, {
             backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 135, 178, 0.1)' 
           }]}>
             <Text style={[styles.summaryText, { color: theme.colors.primary }]}>
@@ -444,7 +377,7 @@ const fetchCategories = async () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.inputContainer, { backgroundColor: theme.colors.card, borderTopColor: theme.colors.border }]}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.input, { backgroundColor: theme.colors.inputBackground }]}
           onPress={navigateToCreateTask}
         >
@@ -620,44 +553,4 @@ const styles = StyleSheet.create({
   emptySubText: {
     fontSize: 14,
   },
-  overlay: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 10,
-  },
-  categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
-  },
-  categoryColor: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  taskInfoContainer: {
-    flex: 1,
-  },
-  taskMetadataRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  metadataText: {
-    fontSize: 11,
-    color: '#757575',
-    marginRight: 8,
-  },
-  indicatorsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 4,
-  }
 });
